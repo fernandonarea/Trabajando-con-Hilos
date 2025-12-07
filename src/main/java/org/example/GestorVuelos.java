@@ -49,10 +49,6 @@ public class GestorVuelos {
                 return true;
             }
         } else {
-            // =================================================
-            // ☠️ CAMINO B: MODO INSEGURO (SIN SYNC Y CON ERROR)
-            // =================================================
-            // Nota: No hay 'synchronized' aquí. Entran todos a la vez.
             log("[Inseguro] " + cliente + " leyendo estado de A" + numAsiento);
 
             if (!asiento.estaOcupado()) {
@@ -74,8 +70,6 @@ public class GestorVuelos {
 
     // --- LÓGICA DE CANCELACIÓN ---
     public boolean cancelar(int numAsiento, String solicitante) {
-        // En cancelación, usamos synchronized siempre para no corromper la memoria,
-        // pero la lógica de 'notify' es lo importante.
         synchronized(this) {
             Asiento asiento = avion.getAsiento(numAsiento);
 
@@ -91,7 +85,6 @@ public class GestorVuelos {
                 log("CANCELADO: A" + numAsiento + " liberado por " + solicitante);
                 actualizarUI(numAsiento, false, "");
 
-                // IMPORTANTE: Despertar a los hilos dormidos (solo útil en modo seguro)
                 notifyAll();
                 return true;
             }
